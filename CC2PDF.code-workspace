@@ -17,5 +17,29 @@
         "recommendations": [
             "sswg.swift-lang"
         ]
+    },
+    "launch": {
+        "configurations": [
+            {
+                "type": "swift",
+                "request": "launch",
+                "args": [],
+                "cwd": "${workspaceFolder:CC2PDF}",
+                "name": "Debug CC2PDF (CC2PDF)",
+                "target": "CC2PDF",
+                "configuration": "debug",
+                "preLaunchTask": "swift: Build Debug CC2PDF (CC2PDF)"
+            },
+            {
+                "type": "swift",
+                "request": "launch",
+                "args": [],
+                "cwd": "${workspaceFolder:CC2PDF}",
+                "name": "Release CC2PDF (CC2PDF)",
+                "target": "CC2PDF",
+                "configuration": "release",
+                "preLaunchTask": "swift: Build Release CC2PDF (CC2PDF)"
+            }
+        ]
     }
 }
