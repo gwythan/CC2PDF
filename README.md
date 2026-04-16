@@ -27,6 +27,12 @@ swift build
 swift test
 ```
 
+## Recent Fixes
+
+- Fixed PDF rendering orientation so output is no longer mirrored/upside-down.
+- Fixed caption flow direction so lines render in correct reading order (top-to-bottom).
+- Added regression tests that validate text geometry/order in generated PDFs.
+
 ## Run
 
 ```bash

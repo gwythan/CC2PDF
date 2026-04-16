@@ -59,4 +59,82 @@ struct ConversionEngineTests {
 
         try? FileManager.default.removeItem(at: output)
     }
+
+    @Test("Rendered line order is top-to-bottom")
+    func renderedLineOrderIsTopToBottom() async throws {
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
+
+        let source = tmp.appendingPathComponent("order.vtt")
+        let vtt = """
+        WEBVTT
+
+        1
+        00:00:00.000 --> 00:00:01.000
+        first line
+
+        2
+        00:00:01.000 --> 00:00:02.000
+        second line
+
+        3
+        00:00:02.000 --> 00:00:03.000
+        third line
+        """
+        try vtt.write(to: source, atomically: true, encoding: .utf8)
+
+        let output = try await ConversionEngine.shared.convert(source, removeMetadata: true)
+        let pdf = try #require(PDFDocument(url: output))
+        let page = try #require(pdf.page(at: 0))
+
+        let firstMatches = pdf.findString("first line", withOptions: [])
+        let thirdMatches = pdf.findString("third line", withOptions: [])
+        #expect(!firstMatches.isEmpty)
+        #expect(!thirdMatches.isEmpty)
+
+        let firstSelection = try #require(firstMatches.first)
+        let thirdSelection = try #require(thirdMatches.first)
+
+        let firstBounds = firstSelection.bounds(for: page)
+        let thirdBounds = thirdSelection.bounds(for: page)
+
+        #expect(firstBounds.minY > thirdBounds.minY)
+
+        try? FileManager.default.removeItem(at: tmp)
+    }
+
+    @Test("Rendered text is not mirrored horizontally")
+    func renderedTextIsNotMirroredHorizontally() async throws {
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
+
+        let source = tmp.appendingPathComponent("mirror.vtt")
+        let vtt = """
+        WEBVTT
+
+        1
+        00:00:00.000 --> 00:00:01.000
+        left right
+        """
+        try vtt.write(to: source, atomically: true, encoding: .utf8)
+
+        let output = try await ConversionEngine.shared.convert(source, removeMetadata: true)
+        let pdf = try #require(PDFDocument(url: output))
+        let page = try #require(pdf.page(at: 0))
+
+        let leftMatches = pdf.findString("left", withOptions: [])
+        let rightMatches = pdf.findString("right", withOptions: [])
+        #expect(!leftMatches.isEmpty)
+        #expect(!rightMatches.isEmpty)
+
+        let leftSelection = try #require(leftMatches.first)
+        let rightSelection = try #require(rightMatches.first)
+
+        let leftBounds = leftSelection.bounds(for: page)
+        let rightBounds = rightSelection.bounds(for: page)
+
+        #expect(leftBounds.midX < rightBounds.midX)
+
+        try? FileManager.default.removeItem(at: tmp)
+    }
 }

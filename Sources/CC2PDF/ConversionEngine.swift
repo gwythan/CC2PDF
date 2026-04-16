@@ -149,8 +149,6 @@ actor ConversionEngine {
 
             context.saveGState()
             context.textMatrix = .identity
-            context.translateBy(x: 0, y: pageRect.height)
-            context.scaleBy(x: 1, y: -1)
 
             let path = CGMutablePath()
             path.addRect(textRect)
