@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+*.xcodeproj/
+*.xcworkspace/
+*.resolved
+.swiftpm/
+build/
+logs/
+*.o
+*.d
